@@ -1,32 +1,76 @@
-// screens/LoginScreen.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
+
+
+
+// screens/RegistrationScreen.js
+import React, { useState } from 'react';
+import { View,Alert, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { FIREBASE_AUTH } from '../FirebasseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@firebase/auth';
+const auth =FIREBASE_AUTH;
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Giriş işlemi
-    console.log('Kullanıcı girişi yapıldı:', username);
-  };
+  const singin =async()=>{
+    try{
+      const response = await signInWithEmailAndPassword(auth,email,password);
+  
+      Alert.alert(
+        'giris İşlemi',
+        'giris işlemi gerçekleştirildi',
+        [
+          {
+            text: 'Tamam',
+            onPress: () => console.log('OK Pressed'),
+          },
+        ],
+        { cancelable: false }
+      );
+  
+    }
+    catch (error) {
+    
+      // Display an error alert
+      Alert.alert(
+        'Hata',
+        'giris işlemi gerçekleştirilemedi',
+        [{ text: 'Tamam' }]
+      );
+    }
+
+
+   }
+
+
+
+
+
+
+
+
+
+
 
   return (
     <View style={styles.container}>
+     
       <TextInput
         style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Kullanıcı adı"
+        value={email}
+        onChangeText={(text)=>setEmail(text)}
+        placeholder="E-posta"
+        keyboardType="email-address"
       />
       <TextInput
         style={styles.input}
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text)=>setPassword(text)}
         placeholder="Şifre"
         secureTextEntry
       />
-      <Button title="Giriş Yap" color="#4a90e2" onPress={handleLogin} />
+    <Button title="Giriş Yap" color="#4a90e2" onPress={singin} />
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>Hesabınız yok mu? Kaydolun</Text>
       </TouchableOpacity>

@@ -1,17 +1,49 @@
 // screens/RegistrationScreen.js
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
-
+import { View,Alert, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { FIREBASE_AUTH } from '../FirebasseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@firebase/auth';
+const auth =FIREBASE_AUTH;
 const RegistrationScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegistration = () => {
-    // Kayıt işlemini burada gerçekleştirin
-    console.log('Kullanıcı kaydedildi:', username, email);
-    // Örneğin, bir API'ye POST isteği göndererek kayıt işlemini tamamlayabilirsiniz.
-  };
+
+
+
+
+
+
+
+ const singUp =async()=>{
+  try{
+    const response = await createUserWithEmailAndPassword(auth,email,password);
+
+    Alert.alert(
+      'Kayıt İşlemi',
+      'Kayıt işlemi gerçekleştirildi',
+      [
+        {
+          text: 'Tamam',
+          onPress: () => console.log('OK Pressed'),
+        },
+      ],
+      { cancelable: false }
+    );
+
+
+  }
+  catch (error) {
+  
+    // Display an error alert
+    Alert.alert(
+      'Hata',
+      'Kayıt işlemi gerçekleştirilemedi',
+      [{ text: 'Tamam' }]
+    );
+  }
+ }
 
   return (
     <View style={styles.container}>
@@ -24,18 +56,18 @@ const RegistrationScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text)=>setEmail(text)}
         placeholder="E-posta"
         keyboardType="email-address"
       />
       <TextInput
         style={styles.input}
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text)=>setPassword(text)}
         placeholder="Şifre"
         secureTextEntry
       />
-      <Button title="Kaydol" color="#4a90e2" onPress={handleRegistration} />
+      <Button title="Kaydol" color="#4a90e2" onPress={singUp} />
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.linkText}>Zaten bir hesabınız var mı? Giriş Yap</Text>
       </TouchableOpacity>
