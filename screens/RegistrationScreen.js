@@ -31,17 +31,13 @@ const RegistrationScreen = ({ navigation }) => {
       ],
       { cancelable: false }
     );
+    navigation.navigate('Login');
 
 
   }
   catch (error) {
-  
-    // Display an error alert
-    Alert.alert(
-      'Hata',
-      'Kayıt işlemi gerçekleştirilemedi',
-      [{ text: 'Tamam' }]
-    );
+    // Hata durumunda kullanıcıya bildirim göster
+    Alert.alert('Hata', 'Giriş başarısız: ' + error.message);
   }
  }
 

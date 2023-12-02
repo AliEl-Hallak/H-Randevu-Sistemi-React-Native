@@ -13,35 +13,27 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const singin =async()=>{
-    try{
-      const response = await signInWithEmailAndPassword(auth,email,password);
-  
-      Alert.alert(
-        'giris İşlemi',
-        'giris işlemi gerçekleştirildi',
-        [
-          {
-            text: 'Tamam',
-            onPress: () => console.log('OK Pressed'),
-          },
-        ],
-        { cancelable: false }
-      );
-  
-    }
-    catch (error) {
-    
-      // Display an error alert
-      Alert.alert(
-        'Hata',
-        'giris işlemi gerçekleştirilemedi',
-        [{ text: 'Tamam' }]
-      );
-    }
+  const handleLogin = async () => {
+    try {
+      // Firebase ile giriş yapma işlemi
+      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      if (userCredential.user.uid === "6KW5dvAl36fdoKVqhu9DVUPBpD92") {
+        const userEmail = userCredential.user.email;
+        // Belirtilen UID'ye sahip kullanıcı için Admin ekranına yönlendir
+        navigation.navigate('Admin', { email: userEmail });
 
+      } else {
+        const userEmail = userCredential.user.email;
+        navigation.navigate('Appointment', { email: userEmail });
 
-   }
+        // Diğer kullanıcılar için Randevu ekranına yönlendir
+       
+      }
+    } catch (error) {
+      // Hata durumunda kullanıcıya bildirim göster
+      Alert.alert('Hata', 'Giriş başarısız: ' + error.message);
+    }
+  };
 
 
 
@@ -70,7 +62,7 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Şifre"
         secureTextEntry
       />
-    <Button title="Giriş Yap" color="#4a90e2" onPress={singin} />
+    <Button title="Giriş Yap" color="#4a90e2" onPress={handleLogin} />
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>Hesabınız yok mu? Kaydolun</Text>
       </TouchableOpacity>
