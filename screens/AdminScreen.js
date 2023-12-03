@@ -19,20 +19,43 @@ const AdminScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.container}>
+<TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate('ListAppointments')}>
+        <Text style={styles.cardTitle}>Randevuları Listele</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => {/* Doktor ekleme işlevi */}}>
+        <Text style={styles.cardTitle}>Doktor Ekle</Text>
+      </TouchableOpacity>
+
             <Text>Merhaba, {email}</Text>
+
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+      flex: 1,
+      padding: 20,
+      alignItems: 'center',
     },
-    // Diğer stil tanımlamaları
-});
+    card: {
+      width: '90%',
+      padding: 20,
+      marginVertical: 10,
+      backgroundColor: '#4a90e2',
+      borderRadius: 10,
+    },
+    cardTitle: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+  });
 
 export default AdminScreen;
 
