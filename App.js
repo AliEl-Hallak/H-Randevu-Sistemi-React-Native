@@ -10,7 +10,8 @@ import AdminScreen from './screens/AdminScreen';
 import ListAppointmentsScreen from './screens/ListAppointmentsScreen';
 import { signOut } from '@firebase/auth';
 import ListOneAppointmentsScreen from './screens/ListOneAppointmentsScreen';
-
+import UpdateAppointmentsScreen from './screens/UpdateAppointmentsScreen';
+import DeletAppointmentsScreen from './screens/DeletAppointmentsScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -25,6 +26,8 @@ const App = () => {
         <Stack.Screen name="ListAppointments" component={ListAppointmentsScreen} />
         <Stack.Screen name="ListoneAppointments" component={ListOneAppointmentsScreen} />
         <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
+        <Stack.Screen name="UpdateAppointments" component={UpdateAppointmentsScreen} />
+        <Stack.Screen name="DeletAppointment" component={DeletAppointmentsScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>
