@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View,Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 
@@ -32,8 +32,9 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
         title: title,
         date: date,
       });
-      Alert.alert("Başarılı", "Randevu güncellendi");
-      navigation.goBack();
+      Alert.alert("Başarılı", "Randevu güncellendi", [
+        { text: 'Tamam', onPress: () => navigation.navigate('ListoneAppointments') }
+      ]);
     } catch (error) {
       Alert.alert("Hata", "Randevu güncellenemedi: " + error.message);
     }
@@ -41,6 +42,7 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>Randevu Güncelleme</Text>
       <TextInput
         style={styles.input}
         value={title}
@@ -51,11 +53,12 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
         style={styles.input}
         value={date}
         onChangeText={setDate}
-        placeholder="Randevu Tarihi"
+        placeholder="Randevu Tarihi (gg/aa/yyyy)"
       />
       <Button
         title="Randevuyu Güncelle"
         onPress={handleUpdate}
+        color="#4a90e2"
       />
     </View>
   );
@@ -65,6 +68,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#fff', // Arka plan rengi
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
   },
   input: {
     width: '100%',
@@ -72,6 +83,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 4,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9', // Giriş alanı arka plan rengi
   },
 });
 

@@ -1,6 +1,6 @@
-// screens/DeletAppointmentsScreen.js
 import React from 'react';
-import { View, Text, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 
@@ -32,9 +32,16 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.date}>{date}</Text>
-      <Button title="Randevuyu Sil" onPress={handleDelete} color="red" />
+      <View style={styles.appointmentCard}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.date}>{date}</Text>
+        <TouchableOpacity 
+          style={styles.deleteButton} 
+          onPress={handleDelete}>
+          <Icon name="delete" size={24} color="white" />
+          <Text style={styles.deleteButtonText}>Randevuyu Sil</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -45,17 +52,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',  // Arka plan rengi
+    backgroundColor: '#f4f4f4',
+  },
+  appointmentCard: {
+    width: '100%',
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 10,
-    color: '#333',  // Metin rengi
   },
   date: {
     fontSize: 16,
-    color: '#666',  // Tarih metni rengi
+    color: '#666',
+    marginBottom: 20,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
+  },
+  deleteButtonText: {
+    marginLeft: 10,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
