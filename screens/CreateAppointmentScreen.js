@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert, Platform } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import { addDoc, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import * as Notifications from 'expo-notifications';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const CreateAppointmentScreen = () => {
   const [appointmentTitle, setAppointmentTitle] = useState('');
-  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleCreateAppointment = async () => {
     try {
@@ -16,9 +18,12 @@ const CreateAppointmentScreen = () => {
       const userEmail = user.email;
       const userId = user.uid;
 
+      // Randevu tarihini ISO string formatına çevir
+      const dateString = appointmentDate.toISOString();
+
       await addDoc(collection(FIRESTORE_DB, 'appointments'), {
         title: appointmentTitle,
-        date: appointmentDate,
+        date: dateString, // String formatında tarih
         userId: userId,
         userEmail: userEmail,
       });
@@ -29,11 +34,21 @@ const CreateAppointmentScreen = () => {
           title: "Randevunuz Oluşturuldu 📅",
           body: 'Yeni randevunuz başarıyla oluşturuldu. Randevu detaylarınızı kontrol ediniz.',
         },
-        trigger: { seconds: 1 }, // 1 saniye sonra gönder
+        trigger: { seconds: 1 },
       });
     } catch (error) {
       Alert.alert('Hata', 'Randevu oluşturulamadı');
     }
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || appointmentDate;
+    setShowDatePicker(Platform.OS === 'ios');
+    setAppointmentDate(currentDate);
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('tr-TR');
   };
 
   return (
@@ -45,12 +60,22 @@ const CreateAppointmentScreen = () => {
         onChangeText={setAppointmentTitle}
         placeholder="Randevu Başlığı"
       />
-      <TextInput
-        style={styles.input}
-        value={appointmentDate}
-        onChangeText={setAppointmentDate}
-        placeholder="Randevu Tarihi (gg/aa/yyyy)"
-      />
+      <TouchableOpacity
+        style={styles.dateInput}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={styles.dateText}>
+          {formatDate(appointmentDate)}
+        </Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={appointmentDate}
+          mode="date"
+          display="default"
+          onChange={onChangeDate}
+        />
+      )}
       <Button
         title="Randevu Oluştur"
         onPress={handleCreateAppointment}
@@ -66,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff', // Arka plan rengi
+    backgroundColor: '#fff',
   },
   header: {
     fontSize: 22,
@@ -80,8 +105,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 4,
-    borderColor: '#ddd', // Kenarlık rengi
-    backgroundColor: '#f9f9f9', // Giriş alanı arka plan rengi
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  dateInput: {
+    width: '100%',
+    marginVertical: 10,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 4,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+    justifyContent: 'center',
   },
 });
 
