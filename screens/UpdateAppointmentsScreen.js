@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View,Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
+import * as Notifications from 'expo-notifications';
 
 const UpdateAppointmentScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState('');
@@ -35,6 +36,15 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
       Alert.alert("Başarılı", "Randevu güncellendi", [
         { text: 'Tamam', onPress: () => navigation.navigate('ListoneAppointments') }
       ]);
+      
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Randevunuz Güncellendi ✅",
+          body: 'Randevu detaylarınız başarıyla güncellendi. Yeni randevu bilgilerinizi kontrol ediniz.',
+        },
+        trigger: { seconds: 1 }, // 1 saniye sonra gönder
+      });
+
     } catch (error) {
       Alert.alert("Hata", "Randevu güncellenemedi: " + error.message);
     }

@@ -13,6 +13,14 @@ import ListOneAppointmentsScreen from './screens/ListOneAppointmentsScreen';
 import UpdateAppointmentsScreen from './screens/UpdateAppointmentsScreen';
 import DeletAppointmentsScreen from './screens/DeletAppointmentsScreen';
 const Stack = createNativeStackNavigator();
+import * as Notifications from 'expo-notifications';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const App = () => {
   return (

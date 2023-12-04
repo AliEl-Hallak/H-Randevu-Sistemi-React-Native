@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
+import * as Notifications from 'expo-notifications';
 
 const DeletAppointmentsScreen = ({ route, navigation }) => {
   const { appointmentId, title, date } = route.params;
@@ -21,6 +22,16 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
               Alert.alert('Başarılı', 'Randevu silindi', [
                 { text: 'Tamam', onPress: () => navigation.navigate('ListoneAppointments') }
               ]);
+
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: "Randevunuz İptal Edildi 🚫",
+                  body: 'Planlarınızı gözden geçirmeniz gerekebilir. Yeni bir randevu için bizimle iletişime geçebilirsiniz.',
+                },
+                trigger: { seconds: 1 }, // 1 saniye sonra gönder
+              });
+
+
             } catch (error) {
               Alert.alert('Hata', 'Randevu silinirken bir hata oluştu: ' + error.message);
             }

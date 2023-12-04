@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import { addDoc, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import PushNotification from 'react-native-push-notification';
+import * as Notifications from 'expo-notifications';
 
 const CreateAppointmentScreen = () => {
   const [appointmentTitle, setAppointmentTitle] = useState('');
@@ -24,6 +24,13 @@ const CreateAppointmentScreen = () => {
       });
 
       Alert.alert('Başarılı', 'Randevu oluşturuldu');
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Randevunuz Oluşturuldu 📅",
+          body: 'Yeni randevunuz başarıyla oluşturuldu. Randevu detaylarınızı kontrol ediniz.',
+        },
+        trigger: { seconds: 1 }, // 1 saniye sonra gönder
+      });
     } catch (error) {
       Alert.alert('Hata', 'Randevu oluşturulamadı');
     }
