@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert, Platform } from 'react-native';
+import React, { useState,useEffect  } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert, Platform , Modal, FlatList } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection ,} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import { getDocs } from 'firebase/firestore';
 
 const CreateAppointmentScreen = () => {
+
+
   const [appointmentTitle, setAppointmentTitle] = useState('');
   const [appointmentDate, setAppointmentDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const querySnapshot = await getDocs(collection(FIRESTORE_DB, 'doctors'));
+      const docs = [];
+      querySnapshot.forEach((doc) => {
+        docs.push({ id: doc.id, ...doc.data() });
+      });
+      setDoctors(docs);
+    };
+
+    fetchDoctors();
+  }, []);
+  const handleSelectDoctor = (doctor) => {
+    setSelectedDoctor(doctor);
+    setModalVisible(false);
+  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => handleSelectDoctor(item)}
+    >
+      <Text style={styles.text}>{`${item.name} (${item.department}, ${item.clinic})`}</Text>
+    </TouchableOpacity>
+  );
 
   const handleCreateAppointment = async () => {
     try {
@@ -17,13 +49,12 @@ const CreateAppointmentScreen = () => {
       const user = auth.currentUser;
       const userEmail = user.email;
       const userId = user.uid;
-
-      // Randevu tarihini ISO string formatına çevir
       const dateString = appointmentDate.toISOString();
 
       await addDoc(collection(FIRESTORE_DB, 'appointments'), {
         title: appointmentTitle,
-        date: dateString, // String formatında tarih
+        date: dateString,
+        doctorId: selectedDoctor,
         userId: userId,
         userEmail: userEmail,
       });
@@ -39,6 +70,10 @@ const CreateAppointmentScreen = () => {
     } catch (error) {
       Alert.alert('Hata', 'Randevu oluşturulamadı');
     }
+    setAppointmentTitle("");
+    setSelectedDoctor("");
+    
+
   };
 
   const onChangeDate = (event, selectedDate) => {
@@ -76,11 +111,44 @@ const CreateAppointmentScreen = () => {
           onChange={onChangeDate}
         />
       )}
-      <Button
-        title="Randevu Oluştur"
-        onPress={handleCreateAppointment}
-        color="#4a90e2"
-      />
+    <TouchableOpacity
+        style={styles.button}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.buttonText}>
+          {selectedDoctor ? `${selectedDoctor.name} (${selectedDoctor.department}, ${selectedDoctor.clinic})` : 'Doktor Seç'}
+        </Text>
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <FlatList
+              data={doctors}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      <TouchableOpacity
+  style={styles.createAppointmentButton}
+  onPress={handleCreateAppointment}
+>
+  <Text style={styles.createAppointmentButtonText}>Randevu Oluştur</Text>
+</TouchableOpacity>
+
     </View>
   );
 };
@@ -118,6 +186,59 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     justifyContent: 'center',
   },
+  dateText: {
+    color: '#333',
+  },
+  button: {
+    width: '100%',
+    padding: 15,
+    backgroundColor: '#ddd',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 5,
+  },
+  item: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  createAppointmentButton: {
+    width: '50%',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "#4a90e2",
+    borderRadius: 6,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2, // Android için gölge efekti
+  },
+  createAppointmentButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  text: {
+    fontSize: 16,
+  }
 });
 
 export default CreateAppointmentScreen;

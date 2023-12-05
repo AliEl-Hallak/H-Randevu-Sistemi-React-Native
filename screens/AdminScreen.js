@@ -1,6 +1,6 @@
 // screens/AdminScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { logoutUser } from '../FirebasseConfig';
 
@@ -18,44 +18,96 @@ const AdminScreen = ({ navigation, route }) => {
     }, [navigation]);
 
     return (
-        <View style={styles.container}>
-<TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate('ListAppointments')}>
-        <Text style={styles.cardTitle}>Randevuları Listele</Text>
-      </TouchableOpacity>
+      <ScrollView style={styles.container}>
+      <Text style={styles.welcomeText}>Merhaba, {email}</Text>
+      
+      <View style={styles.cardContainer}>
+          <TouchableOpacity
+              style={[styles.card, styles.cardCreate]}
+              onPress={() => navigation.navigate('Doctor')}>
+              <Icon name="add-circle-outline" size={30} color="#fff" />
+              <Text style={styles.cardTitle}>Doktor Ekle</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => {/* Doktor ekleme işlevi */}}>
-        <Text style={styles.cardTitle}>Doktor Ekle</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+              style={[styles.card, styles.cardList]}
+              onPress={() => navigation.navigate('ListAppointments')}>
+              <Icon name="format-list-bulleted" size={30} color="#fff" />
+              <Text style={styles.cardTitle}>Randevulari Listele</Text>
+          </TouchableOpacity>
+      </View>
+  </ScrollView>
 
-            <Text>Merhaba, {email}</Text>
 
-        </View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      alignItems: 'center',
-    },
-    card: {
-      width: '90%',
-      padding: 20,
-      marginVertical: 10,
-      backgroundColor: '#4a90e2',
-      borderRadius: 10,
-    },
-    cardTitle: {
-      color: 'white',
-      fontWeight: 'bold',
-      textAlign: 'center',
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#f4f4f4', // Arka plan rengi
+  },
+  welcomeText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    margin: 20,
+    textAlign: 'center',
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+  },
+  card: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+    margin: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardCreate: {
+    backgroundColor: '#4caf50', // Yeşil renk
+  },
+  cardList: {
+    backgroundColor: '#2196f3', // Mavi renk
+  },
+  cardTitle: {
+    marginTop: 10,
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});
 
 export default AdminScreen;
+
+
+
+
+
+
+
+
+
 

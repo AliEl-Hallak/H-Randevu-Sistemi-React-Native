@@ -12,6 +12,7 @@ import { signOut } from '@firebase/auth';
 import ListOneAppointmentsScreen from './screens/ListOneAppointmentsScreen';
 import UpdateAppointmentsScreen from './screens/UpdateAppointmentsScreen';
 import DeletAppointmentsScreen from './screens/DeletAppointmentsScreen';
+import DoctorAdd from './screens/DoctorAdd ';
 const Stack = createNativeStackNavigator();
 import * as Notifications from 'expo-notifications';
 Notifications.setNotificationHandler({
@@ -36,6 +37,7 @@ const App = () => {
         <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
         <Stack.Screen name="UpdateAppointments" component={UpdateAppointmentsScreen} />
         <Stack.Screen name="DeletAppointment" component={DeletAppointmentsScreen} />
+        <Stack.Screen name="Doctor" component={DoctorAdd} />
 
       </Stack.Navigator>
     </NavigationContainer>

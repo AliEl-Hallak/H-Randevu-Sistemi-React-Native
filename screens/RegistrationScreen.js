@@ -39,6 +39,8 @@ const RegistrationScreen = ({ navigation }) => {
     // Hata durumunda kullanıcıya bildirim göster
     Alert.alert('Hata', 'Giriş başarısız: ' + error.message);
   }
+  setEmail("");
+  setPassword("");
  }
 
   return (

@@ -49,6 +49,40 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  button: {
+    padding: 10,
+    backgroundColor: '#e7e7e7',
+    borderRadius: 5,
+  },
+  appointmentItem: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    backgroundColor: '#f9f9f9',  // Arka plan rengi
+    borderRadius: 10,           // Kenar yuvarlatma
+    marginVertical: 8,          // Dikey marj
+    shadowColor: '#000',          // Gölgelendirme rengi
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,                 // Android için gölgelendirme derinliği
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 16,               // Font boyutu
+    color: '#333',              // Metin rengi
+    marginBottom: 5,            // Başlık ile tarih arasındaki mesafe
+  },
+  date: {
+    color: '#666',              // Tarih metni rengi
+    fontSize: 14,               // Tarih metni font boyutu
+  },
 });
+
 
 export default ListAppointmentsScreen;
