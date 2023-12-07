@@ -1,43 +1,78 @@
+// AppointmentScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, TouchableOpacity, ScrollView, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebasseConfig';
+import { doc, getDoc } from '@firebase/firestore';
 import { logoutUser } from '../FirebasseConfig';
 
-const AppointmentScreen = ({ navigation, route }) => {
-    const { email } = route.params;
+const AppointmentScreen = ({ navigation }) => {
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={handleUserDetails}>
+            <Icon name="person" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => logoutUser(navigation)} style={{ marginLeft: 15 }}>
+            <Icon name="logout" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation]);
 
-    React.useLayoutEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity onPress={() => logoutUser(navigation)}>
-                    <Icon name="logout" size={24} color="black" />
-                </TouchableOpacity>
-            ),
+  const handleUserDetails = async () => {
+    const user = FIREBASE_AUTH.currentUser;
+    if (user) {
+      const userDetails = await getUserDetails(user.uid);
+      if (userDetails) {
+        navigation.navigate('UserProfile', {
+          email: user.email,
+          username: userDetails.username,
+          phoneNumber: userDetails.phoneNumber
         });
-    }, [navigation]);
+      }
+    }
+  };
 
-    return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.welcomeText}>Merhaba, {email}</Text>
-            
-            <View style={styles.cardContainer}>
-                <TouchableOpacity
-                    style={[styles.card, styles.cardCreate]}
-                    onPress={() => navigation.navigate('CreateAppointment')}>
-                    <Icon name="add-circle-outline" size={30} color="#fff" />
-                    <Text style={styles.cardTitle}>Randevu Oluştur</Text>
-                </TouchableOpacity>
+  // ...
 
-                <TouchableOpacity
-                    style={[styles.card, styles.cardList]}
-                    onPress={() => navigation.navigate('ListoneAppointments')}>
-                    <Icon name="format-list-bulleted" size={30} color="#fff" />
-                    <Text style={styles.cardTitle}>Randevu Listele</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
-    );
+  return (
+    <ScrollView style={styles.container}>
+        
+        <View style={styles.cardContainer}>
+            <TouchableOpacity
+                style={[styles.card, styles.cardCreate]}
+                onPress={() => navigation.navigate('CreateAppointment')}>
+                <Icon name="add-circle-outline" size={30} color="#fff" />
+                <Text style={styles.cardTitle}>Randevu Oluştur</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={[styles.card, styles.cardList]}
+                onPress={() => navigation.navigate('ListoneAppointments')}>
+                <Icon name="format-list-bulleted" size={30} color="#fff" />
+                <Text style={styles.cardTitle}>Randevu Listele</Text>
+            </TouchableOpacity>
+        </View>
+    </ScrollView>
+);
+
 };
+
+async function getUserDetails(userId) {
+  const userRef = doc(FIRESTORE_DB, 'users', userId);
+  const docSnap = await getDoc(userRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    console.log('No such user!');
+    return null;
+  }
+}
+   
 
 const styles = StyleSheet.create({
     container: {
