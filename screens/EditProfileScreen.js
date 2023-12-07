@@ -1,36 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebasseConfig';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { useNavigation } from '@react-navigation/native';
+import { getAuth, updatePassword } from 'firebase/auth';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Eklemeyi unutmayın
 
 const EditProfileScreen = ({ route }) => {
-  const { uid, username: initialUsername, phoneNumber: initialPhoneNumber, email: initialEmail } = route.params;
-
-  const [username, setUsername] = useState(initialUsername);
-  const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
-
+  const [username, setUsername] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const navigation = useNavigation();
+  const [newPassword, setNewPassword] = useState('');
+
+  // Burada uid değerinin varlığını ve geçerliliğini kontrol ediyoruz
+  const uid = route.params?.uid;
+  if (!uid) {
+    Alert.alert('Hata', 'Kullanıcı tanımlayıcısı geçersiz.');
+    return null; // Eğer uid geçersizse, bileşeni render etmeyi bırakıyoruz.
+  }
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const docRef = doc(FIRESTORE_DB, 'users', uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUsername(docSnap.data().username || '');
+        setPhoneNumber(docSnap.data().phoneNumber || '');
+      } else {
+        Alert.alert("Kullanıcı bulunamadı");
+      }
+    };
+
+    loadUserData();
+  }, [uid]);
 
   const handleSaveChanges = async () => {
+    const userRef = doc(FIRESTORE_DB, 'users', uid);
     try {
-      // Firestore'daki kullanıcı belgesini güncelle
-      await FIRESTORE_DB.collection('users').doc(uid).update({
-        username,
-        phoneNumber,
+      await updateDoc(userRef, {
+        username: username,
+        phoneNumber: phoneNumber,
       });
-
-      // Başarı mesajı göster
-      Alert.alert('Başarı', 'Değişiklikler kaydedildi');
-
-      // Kullanıcıyı profil ekranına geri gönder
-      navigation.navigate('UserProfileScreen', {
-        username,
-        email: initialEmail,
-        phoneNumber,
-      });
+      Alert.alert("Başarılı", "Profil güncellendi", [
+        { text: 'Tamam', onPress: () => navigation.goBack() }
+      ]);
     } catch (error) {
-      // Hata durumunda kullanıcıya bildirim göster
-      Alert.alert('Hata', 'Değişiklikler kaydedilemedi: ' + error.message);
+      Alert.alert("Hata", "Profil güncellenemedi: " + error.message);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error('Kullanıcı oturum açmamış');
+      return;
+    }
+
+    if (!newPassword) {
+      Alert.alert('Hata', 'Yeni şifre boş olamaz.');
+      return;
+    }
+
+    try {
+      await updatePassword(user, newPassword);
+      console.log('Şifre başarıyla güncellendi');
+      Alert.alert('Başarılı', 'Şifre başarıyla güncellendi');
+    } catch (error) {
+      console.error('Şifre güncellenirken bir hata oluştu:', error);
+      Alert.alert('Hata', 'Şifre güncellenirken bir hata oluştu: ' + error.message);
     }
   };
 
@@ -41,6 +81,7 @@ const EditProfileScreen = ({ route }) => {
         style={styles.input}
         value={username}
         onChangeText={setUsername}
+        placeholder="Kullanıcı adınızı girin"
       />
 
       <Text style={styles.label}>Telefon Numarası</Text>
@@ -48,7 +89,21 @@ const EditProfileScreen = ({ route }) => {
         style={styles.input}
         value={phoneNumber}
         onChangeText={setPhoneNumber}
+        placeholder="Telefon numaranızı girin"
       />
+
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          value={newPassword}
+          onChangeText={setNewPassword}
+          secureTextEntry
+          placeholder="Yeni Şifre"
+        />
+        <TouchableOpacity style={styles.passwordIcon} onPress={handleChangePassword}>
+          <Icon name="vpn-key" size={24} color="#2196F3" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.saveButtonText}>Değişiklikleri Kaydet</Text>
@@ -86,6 +141,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 16,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  },
+  passwordIcon: {
+    marginLeft: 10,
   },
 });
 

@@ -1,19 +1,32 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { FIREBASE_AUTH } from '../FirebasseConfig'; // Firebase Authentication'ı import ediyoruz
 
 const UserProfileScreen = ({ route, navigation }) => {
+  // Aktif kullanıcının bilgilerini alıyoruz
+  const user = FIREBASE_AUTH.currentUser;
+
+  // Eğer bir kullanıcı varsa, onun bilgilerini kullanıyoruz
+  const uid = user ? user.uid : null;
   const { username, email, phoneNumber } = route.params;
 
   const handleEditProfile = () => {
+    // Eğer uid yoksa, hata mesajı göster
+    if (!uid) {
+      console.error('Kullanıcı ID bulunamadı');
+      return;
+    }
+
     // Profil düzenleme ekranına yönlendirme
     navigation.navigate('EditProfileScreen', {
-      // Kullanıcının mevcut bilgilerini düzenleme ekranına iletebilirsiniz
+      uid,
       username,
       email,
       phoneNumber,
     });
   };
+
 
   return (
     <View style={styles.container}>

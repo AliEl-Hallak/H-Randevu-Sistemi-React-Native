@@ -43,7 +43,6 @@ const App = () => {
         <Stack.Screen name="UserProfile" component={UserProfileScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
 
-
         
       </Stack.Navigator>
     </NavigationContainer>
