@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { getDocs } from 'firebase/firestore';
+import LottieView from 'lottie-react-native';
 
 const CreateAppointmentScreen = () => {
 
@@ -88,6 +89,7 @@ const CreateAppointmentScreen = () => {
 
   return (
     <View style={styles.container}>
+      
       <Text style={styles.header}>Yeni Randevu Oluştur</Text>
       <TextInput
         style={styles.input}
@@ -148,7 +150,14 @@ const CreateAppointmentScreen = () => {
 >
   <Text style={styles.createAppointmentButtonText}>Randevu Oluştur</Text>
 </TouchableOpacity>
-
+   <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/r4.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
     </View>
   );
 };
@@ -238,7 +247,19 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-  }
+  },
+  lottieContainer: {
+    alignItems: 'center', // Center the LottieView horizontally
+    justifyContent: 'center', // Center the LottieView vertically
+    marginTop: 0, // Add some space above the LottieView
+  },
+  lottieAnimation: {
+    width: 300, // Adjust width as needed
+    height: 200, // Adjust height as needed
+  },
+  
+
+
 });
 
 export default CreateAppointmentScreen;

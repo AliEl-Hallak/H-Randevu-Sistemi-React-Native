@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
+import LottieView from 'lottie-react-native';
 
 const DoctorAdd = () => {
   const [department, setDepartment] = useState('');
@@ -43,22 +44,45 @@ const DoctorAdd = () => {
         onChangeText={setDoctorName}
         placeholder="Doktor Adı"
       />
-      <Button
-        title="Ekle"
-        onPress={handleAddDoctor}
-        color="#4a90e2"
-      />
+   <TouchableOpacity style={styles.saveButton} onPress={handleAddDoctor}>
+        <Text style={styles.saveButtonText}>Ekle</Text>
+      </TouchableOpacity>
+
+     
+      <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/r10.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
     </View>
+
+    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Align items to the start
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
+  },
+  saveButton: {
+    marginTop:10,
+    width :'100%',
+    backgroundColor: '#4caf50',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   header: {
     fontSize: 22,
@@ -68,13 +92,23 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: 10, // Reduced vertical margin
     borderWidth: 1,
     padding: 10,
     borderRadius: 4,
     borderColor: '#ddd',
     backgroundColor: '#f9f9f9',
   },
+  lottieContainer: {
+    flexGrow: 1, // This will push the container to the bottom
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lottieAnimation: {
+    width: 300,
+    height: 200,
+  },
 });
+
 
 export default DoctorAdd;

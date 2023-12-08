@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { FIREBASE_AUTH } from '../FirebasseConfig'; // Firebase Authentication'ı import ediyoruz
+import LottieView from 'lottie-react-native';
 
 const UserProfileScreen = ({ route, navigation }) => {
   // Aktif kullanıcının bilgilerini alıyoruz
@@ -42,6 +43,16 @@ const UserProfileScreen = ({ route, navigation }) => {
         <Icon name="edit" size={24} color="white" />
         <Text style={styles.editButtonText}>Profili Düzenle</Text>
       </TouchableOpacity>
+
+      <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/r9.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
+
     </View>
   );
 };
@@ -86,6 +97,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
   },
+  lottieContainer: {
+    width: '100%', // Takes full width of the container
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20, // Adjust as needed
+  },
+  lottieAnimation: {
+    width: 200, // Adjust the size as needed
+    height: 300, // Keep the aspect ratio of the Lottie file
+  },
+
 });
 
 export default UserProfileScreen;

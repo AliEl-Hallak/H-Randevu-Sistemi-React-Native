@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { logoutUser } from '../FirebasseConfig';
+import LottieView from 'lottie-react-native';
 
 const AdminScreen = ({ navigation, route }) => {
     const { email } = route.params;
@@ -19,7 +20,6 @@ const AdminScreen = ({ navigation, route }) => {
 
     return (
       <ScrollView style={styles.container}>
-      <Text style={styles.welcomeText}>Merhaba, {email}</Text>
       
       <View style={styles.cardContainer}>
           <TouchableOpacity
@@ -35,23 +35,19 @@ const AdminScreen = ({ navigation, route }) => {
               <Icon name="format-list-bulleted" size={30} color="#fff" />
               <Text style={styles.cardTitle}>Randevulari Listele</Text>
           </TouchableOpacity>
+         
       </View>
+
+      <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/r1.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
+      
   </ScrollView>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     );
 };
@@ -69,7 +65,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cardContainer: {
-    flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10,
   },
@@ -97,6 +92,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  lottieContainer: {
+    alignItems: 'center', // Center the LottieView horizontally
+    justifyContent: 'center', // Center the LottieView vertically
+    marginTop: 0, // Add some space above the LottieView
+  },
+  lottieAnimation: {
+    width: 300, // Adjust width as needed
+    height: 350, // Adjust height as needed
   },
 });
 

@@ -5,6 +5,7 @@ import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, updatePassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Eklemeyi unutmayın
+import LottieView from 'lottie-react-native';
 
 const EditProfileScreen = ({ route }) => {
   const [username, setUsername] = useState('');
@@ -108,6 +109,14 @@ const EditProfileScreen = ({ route }) => {
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.saveButtonText}>Değişiklikleri Kaydet</Text>
       </TouchableOpacity>
+      <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/r8.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
     </View>
   );
 };
@@ -157,6 +166,15 @@ const styles = StyleSheet.create({
   },
   passwordIcon: {
     marginLeft: 10,
+  },
+  lottieContainer: {
+    alignItems: 'center', // Center the LottieView horizontally
+    justifyContent: 'center', // Center the LottieView vertically
+    marginTop: 0, // Add some space above the LottieView
+  },
+  lottieAnimation: {
+    width: 300, // Adjust width as needed
+    height: 350, // Adjust height as needed
   },
 });
 
