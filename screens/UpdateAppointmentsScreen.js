@@ -3,6 +3,7 @@ import { View,Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
+import LottieView from 'lottie-react-native';
 
 const UpdateAppointmentScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState('');
@@ -34,7 +35,7 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
         date: date,
       });
       Alert.alert("Başarılı", "Randevu güncellendi", [
-        { text: 'Tamam', onPress: () => navigation.navigate('ListoneAppointments') }
+        { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
       ]);
       
       Notifications.scheduleNotificationAsync({
@@ -65,11 +66,25 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
         onChangeText={setDate}
         placeholder="Randevu Tarihi (gg/aa/yyyy)"
       />
-      <Button
-        title="Randevuyu Güncelle"
-        onPress={handleUpdate}
-        color="#4a90e2"
-      />
+
+
+<View  style={styles.button}>
+<Button
+       
+       title="Randevuyu Güncelle"
+       onPress={handleUpdate}
+       color="#4a90e2"
+     />
+</View>
+     
+         <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/update.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
     </View>
   );
 };
@@ -86,6 +101,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
+  },
+  button: {
+    width :"100%",
+    marginTop: 10,
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+  },
+  lottieContainer: {
+    flexGrow: 1, // This will push the container to the bottom
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lottieAnimation: {
+    width: 300,
+    height: 400,
   },
   input: {
     width: '100%',

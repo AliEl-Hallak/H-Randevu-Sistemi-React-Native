@@ -5,7 +5,6 @@ import { addDoc, collection ,} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import { getDocs } from 'firebase/firestore';
 import LottieView from 'lottie-react-native';
 
@@ -18,6 +17,7 @@ const CreateAppointmentScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [error, setError] = useState({});
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -31,8 +31,31 @@ const CreateAppointmentScreen = () => {
 
     fetchDoctors();
   }, []);
+
+  const validateInput = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (!appointmentTitle.trim()) {
+      newErrors.appointmentTitle = 'Lütfen bir randevu başlığı giriniz.';
+      isValid = false;
+    }
+
+    if (!selectedDoctor) {
+      newErrors.selectedDoctor = 'Lütfen bir doktor seçiniz.';
+      isValid = false;
+    }
+
+    // Tarih kontrolü için ekstra bir durum gerekli olabilir
+    // Örneğin, bugünden önceki bir tarihi seçmek yasak olabilir
+
+    setError(newErrors);
+    return isValid;
+  };
   const handleSelectDoctor = (doctor) => {
     setSelectedDoctor(doctor);
+    setError(prevState => ({ ...prevState, selectedDoctor: '' })); // Hata mesajını temizle
+
     setModalVisible(false);
   };
   const renderItem = ({ item }) => (
@@ -45,6 +68,7 @@ const CreateAppointmentScreen = () => {
   );
 
   const handleCreateAppointment = async () => {
+    if (validateInput()) {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -73,7 +97,7 @@ const CreateAppointmentScreen = () => {
     }
     setAppointmentTitle("");
     setSelectedDoctor("");
-    
+  }
 
   };
 
@@ -92,11 +116,19 @@ const CreateAppointmentScreen = () => {
       
       <Text style={styles.header}>Yeni Randevu Oluştur</Text>
       <TextInput
-        style={styles.input}
-        value={appointmentTitle}
-        onChangeText={setAppointmentTitle}
-        placeholder="Randevu Başlığı"
-      />
+  style={error.appointmentTitle ? styles.inputError : styles.input}
+  value={appointmentTitle}
+  onChangeText={(text) => {
+    setAppointmentTitle(text);
+    if (error.appointmentTitle) {
+      setError(prevState => ({ ...prevState, appointmentTitle: '' }));
+    }
+  }}
+  maxLength={30}
+  placeholder="Randevu Başlığı"
+/>
+{error.appointmentTitle ? <Text style={styles.errorText}>{error.appointmentTitle}</Text> : null}
+
       <TouchableOpacity
         style={styles.dateInput}
         onPress={() => setShowDatePicker(true)}
@@ -121,6 +153,7 @@ const CreateAppointmentScreen = () => {
           {selectedDoctor ? `${selectedDoctor.name} (${selectedDoctor.department}, ${selectedDoctor.clinic})` : 'Doktor Seç'}
         </Text>
       </TouchableOpacity>
+      {error.selectedDoctor ? <Text style={styles.errorText}>{error.selectedDoctor}</Text> : null}
 
       <Modal
         animationType="slide"
@@ -152,7 +185,7 @@ const CreateAppointmentScreen = () => {
 </TouchableOpacity>
    <View style={styles.lottieContainer}>
           <LottieView
-            source={require('../resim/r4.json')} // Make sure this path is correct
+            source={require('../resim/r3.json')} // Make sure this path is correct
             autoPlay
             loop={true}
             style={styles.lottieAnimation}
@@ -165,7 +198,6 @@ const CreateAppointmentScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
@@ -175,6 +207,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
+  },
+  inputError: {
+    width: '100%',
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 4,
+    backgroundColor: '#f9f9f9',
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 5,
   },
   input: {
     width: '100%',
@@ -221,6 +266,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 5,
   },
+  inputError: {
+    width: '100%',
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 4,
+    backgroundColor: '#f9f9f9',    
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    // Diğer stil tanımlamaları
+  },
   item: {
     padding: 20,
     borderBottomWidth: 1,
@@ -255,7 +313,7 @@ const styles = StyleSheet.create({
   },
   lottieAnimation: {
     width: 300, // Adjust width as needed
-    height: 200, // Adjust height as needed
+    height: 400, // Adjust height as needed
   },
   
 

@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
+import LottieView from 'lottie-react-native';
 
 const DeletAppointmentsScreen = ({ route, navigation }) => {
   const { appointmentId, title, date } = route.params;
@@ -20,7 +21,7 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
             try {
               await deleteDoc(doc(FIRESTORE_DB, 'appointments', appointmentId));
               Alert.alert('Başarılı', 'Randevu silindi', [
-                { text: 'Tamam', onPress: () => navigation.navigate('ListoneAppointments') }
+                { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
               ]);
 
               Notifications.scheduleNotificationAsync({
@@ -53,6 +54,15 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
           <Text style={styles.deleteButtonText}>Randevuyu Sil</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/delete.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
     </View>
   );
 };
@@ -60,7 +70,6 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#f4f4f4',
@@ -75,6 +84,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  lottieContainer: {
+    flexGrow: 1, // This will push the container to the bottom
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lottieAnimation: {
+    width: 300,
+    height: 400,
   },
   title: {
     fontSize: 20,

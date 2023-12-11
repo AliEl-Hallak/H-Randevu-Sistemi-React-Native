@@ -4,6 +4,7 @@ import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import LottieView from 'lottie-react-native';
 
 const ListOneAppointmentsScreen = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
@@ -33,10 +34,15 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.appointmentItem}>
-            
-             <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.date}>{item.date}</Text>
-            
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.date}>{item.date}</Text>
+            <Text style={styles.doctorInfo}>
+  Clinic: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
+  {'\n'}
+  Department: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
+  {'\n'}
+  Name: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
+</Text>      
             <View style={styles.buttonsContainer}>
               <TouchableOpacity
                 style={styles.button}
@@ -74,12 +80,37 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   appointmentItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    backgroundColor: '#ffffff',      // Parlak beyaz arka plan
+    borderRadius: 20,                // Daha belirgin yuvarlatılmış köşeler
+    padding: 20,                     // Geniş iç boşluk
+    marginVertical: 12,              // Daha fazla dikey aralık
+    marginHorizontal: 15,            // Daha fazla yatay aralık
+    borderWidth: 2,                  // Daha kalın çerçeve
+    borderColor: '#d3d3d3',          // Açık gri çerçeve rengi
+    shadowColor: '#000',             // Gölge rengi
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,             // Gölge opaklığı
+    shadowRadius: 3.84,              // Gölge yarıçapı
+    elevation: 5,                    // Android için gölge efekti
   },
   title: {
-    fontWeight: 'bold',
+     
+    fontSize: 22,                    // Daha büyük ve belirgin başlık fontu
+    fontWeight: '700',               // Ağır font ağırlığı
+    color: '#2a2a2a',                // Koyu gri başlık rengi
+    marginBottom: 10,                // Başlık alt boşluk
+  },
+  date: {
+    fontSize: 18,                    // Büyütülmüş tarih fontu
+    fontWeight: '500',               // Orta kalınlıkta font ağırlığı
+    color: '#4a4a4a',                // Koyu gri tarih rengi
+    marginBottom: 15,                // Arttırılmış tarih alt boşluk
+  },
+  doctorInfo: {
+    fontSize: 16,                    // Net doktor bilgisi fontu
+    color: '#606060',                // Koyu gri metin rengi
+    lineHeight: 24,                  // Geniş satır yüksekliği
+    fontStyle: 'italic',             // İtalik font stili
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -91,28 +122,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#e7e7e7',
     borderRadius: 5,
   },
-  appointmentItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#f9f9f9',  // Arka plan rengi
-    borderRadius: 10,           // Kenar yuvarlatma
-    marginVertical: 8,          // Dikey marj
-    shadowColor: '#000',          // Gölgelendirme rengi
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,                 // Android için gölgelendirme derinliği
+  lottieContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 16,               // Font boyutu
-    color: '#333',              // Metin rengi
-    marginBottom: 5,            // Başlık ile tarih arasındaki mesafe
-  },
-  date: {
-    color: '#666',              // Tarih metni rengi
-    fontSize: 14,               // Tarih metni font boyutu
+  lottieAnimation: {
+    width: 300,
+    height: 350,
   },
 });
 
