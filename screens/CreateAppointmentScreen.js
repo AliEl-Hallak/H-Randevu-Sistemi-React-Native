@@ -1,5 +1,5 @@
 import React, { useState,useEffect  } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert, Platform , Modal, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, Platform , Modal, FlatList } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import { addDoc, collection ,} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -8,7 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDocs } from 'firebase/firestore';
 import LottieView from 'lottie-react-native';
 
-const CreateAppointmentScreen = () => {
+const CreateAppointmentScreen = ({ navigation }) => {
 
 
   const [appointmentTitle, setAppointmentTitle] = useState('');
@@ -18,6 +18,7 @@ const CreateAppointmentScreen = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [error, setError] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -70,6 +71,8 @@ const CreateAppointmentScreen = () => {
   const handleCreateAppointment = async () => {
     if (validateInput()) {
     try {
+      setIsLoading(true); // Bekleme durumunu başlat
+
       const auth = getAuth();
       const user = auth.currentUser;
       const userEmail = user.email;
@@ -83,8 +86,12 @@ const CreateAppointmentScreen = () => {
         userId: userId,
         userEmail: userEmail,
       });
+      setIsLoading(false); // Bekleme durumunu başlat
 
-      Alert.alert('Başarılı', 'Randevu oluşturuldu');
+      Alert.alert("Başarılı", "Randevu oluşturuldu", [
+        { text: 'Tamam', onPress: () => navigation.goBack() }
+      ]);
+    
       Notifications.scheduleNotificationAsync({
         content: {
           title: "Randevunuz Oluşturuldu 📅",
@@ -93,6 +100,8 @@ const CreateAppointmentScreen = () => {
         trigger: { seconds: 1 },
       });
     } catch (error) {
+      setIsLoading(false); // Bekleme durumunu başlat
+
       Alert.alert('Hata', 'Randevu oluşturulamadı');
     }
     setAppointmentTitle("");
@@ -182,6 +191,9 @@ const CreateAppointmentScreen = () => {
   onPress={handleCreateAppointment}
 >
   <Text style={styles.createAppointmentButtonText}>Randevu Oluştur</Text>
+
+ 
+
 </TouchableOpacity>
    <View style={styles.lottieContainer}>
           <LottieView
@@ -191,6 +203,12 @@ const CreateAppointmentScreen = () => {
             style={styles.lottieAnimation}
           />
         </View>
+        {/* Bekleme göstergesi */}
+ {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4caf50" />
+        </View>
+      )}
     </View>
   );
 };
@@ -279,6 +297,19 @@ const styles = StyleSheet.create({
     color: 'red',
     // Diğer stil tanımlamaları
   },
+  appointmentItem: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    backgroundColor: '#f9f9f9',  // Arka plan rengi
+    borderRadius: 10,           // Kenar yuvarlatma
+    marginVertical: 8,          // Dikey marj
+    shadowColor: '#000',          // Gölgelendirme rengi
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,                 // Android için gölgelendirme derinliği
+  },
   item: {
     padding: 20,
     borderBottomWidth: 1,
@@ -315,7 +346,17 @@ const styles = StyleSheet.create({
     width: 300, // Adjust width as needed
     height: 400, // Adjust height as needed
   },
-  
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
 
 
 });

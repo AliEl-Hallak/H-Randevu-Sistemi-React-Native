@@ -1,6 +1,7 @@
 // AppointmentScreen.js
-import React from 'react';
-import { View, TouchableOpacity, ScrollView, Text, StyleSheet } from 'react-native';
+import React ,{ useState } from 'react';
+
+import { View, TouchableOpacity, ScrollView,ActivityIndicator, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebasseConfig';
 import { doc, getDoc } from '@firebase/firestore';
@@ -8,6 +9,8 @@ import { logoutUser } from '../FirebasseConfig';
 import LottieView from 'lottie-react-native';
 
 const AppointmentScreen = ({ navigation }) => {
+    const [isLoading, setIsLoading] = useState(false); // Veriler yükleniyor başlangıçta true olarak ayarlandı
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -24,10 +27,15 @@ const AppointmentScreen = ({ navigation }) => {
   }, [navigation]);
 
   const handleUserDetails = async () => {
+    setIsLoading(true); // Veriler yüklendiğinde beklemeyi kaldır
+
     const user = FIREBASE_AUTH.currentUser;
     if (user) {
       const userDetails = await getUserDetails(user.uid);
       if (userDetails) {
+        setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
+
         navigation.navigate('UserProfile', {
           email: user.email,
           username: userDetails.username,
@@ -41,7 +49,11 @@ const AppointmentScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-        
+             {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4caf50" />
+        </View>
+      )}
         <View style={styles.cardContainer}>
             <TouchableOpacity
                 style={[styles.card, styles.cardCreate]}
@@ -125,6 +137,17 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
       fontSize: 16,
+    },
+    loadingContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
     },
     lottieContainer: {
       alignItems: 'center', // Center the LottieView horizontally

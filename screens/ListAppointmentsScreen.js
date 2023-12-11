@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet,ActivityIndicator } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 
 const ListAppointmentsScreen = () => {
   const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Veriler yükleniyor başlangıçta true olarak ayarlandı
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -14,13 +15,21 @@ const ListAppointmentsScreen = () => {
         ...doc.data(),
       }));
       setAppointments(fetchedAppointments);
+      setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
     };
 
     fetchAppointments();
   }, []);
 
   return (
+    
     <View style={styles.container}>
+       {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4caf50" />
+        </View>
+      )}
       <FlatList
         data={appointments}
         keyExtractor={item => item.id}
@@ -58,6 +67,17 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#e7e7e7',
     borderRadius: 5,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
   appointmentItem: {
     padding: 20,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet,ActivityIndicator } from 'react-native';
 import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native';
@@ -9,6 +9,7 @@ import LottieView from 'lottie-react-native';
 const ListOneAppointmentsScreen = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
   const userId = FIREBASE_AUTH.currentUser ? FIREBASE_AUTH.currentUser.uid : null;
+  const [isLoading, setIsLoading] = useState(true); // Veriler yükleniyor başlangıçta true olarak ayarlandı
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -20,7 +21,10 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
           id: doc.id,
           ...doc.data(),
         }));
+
         setAppointments(fetchedAppointments);
+        setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
       }
     };
 
@@ -29,6 +33,11 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+           {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4caf50" />
+        </View>
+      )}
       <FlatList
         data={appointments}
         keyExtractor={item => item.id}
@@ -44,6 +53,7 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
   Name: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
 </Text>      
             <View style={styles.buttonsContainer}>
+       
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
@@ -78,6 +88,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
   appointmentItem: {
     backgroundColor: '#ffffff',      // Parlak beyaz arka plan

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity,ActivityIndicator, Alert } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +12,7 @@ const EditProfileScreen = ({ route }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const navigation = useNavigation();
   const [newPassword, setNewPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Burada uid değerinin varlığını ve geçerliliğini kontrol ediyoruz
   const uid = route.params?.uid;
@@ -39,14 +40,20 @@ const EditProfileScreen = ({ route }) => {
   const handleSaveChanges = async () => {
     const userRef = doc(FIRESTORE_DB, 'users', uid);
     try {
+      setIsLoading(true); // Bekleme durumunu başlat
+
       await updateDoc(userRef, {
         username: username,
         phoneNumber: phoneNumber,
       });
+      setIsLoading(false); // Bekleme durumunu başlat
+
       Alert.alert("Başarılı", "Profil güncellendi", [
-        { text: 'Tamam', onPress: () => navigation.goBack() }
+        { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
       ]);
     } catch (error) {
+      setIsLoading(false); // Bekleme durumunu başlat
+
       Alert.alert("Hata", "Profil güncellenemedi: " + error.message);
     }
   };
@@ -77,6 +84,12 @@ const EditProfileScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
+        {/* Bekleme göstergesi */}
+ {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4caf50" />
+        </View>
+      )}
       <Text style={styles.label}>Kullanıcı Adı</Text>
       <TextInput
         style={styles.input}
@@ -164,6 +177,18 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+
   passwordIcon: {
     marginLeft: 10,
   },
