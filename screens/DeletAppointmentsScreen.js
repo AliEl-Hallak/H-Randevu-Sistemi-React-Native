@@ -1,13 +1,15 @@
-import React from 'react';
+import React ,{useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 const DeletAppointmentsScreen = ({ route, navigation }) => {
   const { appointmentId, title, date } = route.params;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = async () => {
     Alert.alert(
@@ -19,7 +21,12 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
           text: 'Sil',
           onPress: async () => {
             try {
+              setIsLoading(true); // Bekleme durumunu başlat
+
               await deleteDoc(doc(FIRESTORE_DB, 'appointments', appointmentId));
+              setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+ 
+             
               Alert.alert('Başarılı', 'Randevu silindi', [
                 { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
               ]);
@@ -34,6 +41,8 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
 
 
             } catch (error) {
+              setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
               Alert.alert('Hata', 'Randevu silinirken bir hata oluştu: ' + error.message);
             }
           },
@@ -44,6 +53,11 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+              {isLoading && (
+        <View style={styles.loadingContainer}>
+<DotIndicator  color='red' />
+        </View>
+      )}
       <View style={styles.appointmentCard}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.date}>{date}</Text>
@@ -117,6 +131,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: 'white',
     fontWeight: 'bold',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });
 

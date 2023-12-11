@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet,ActivityIndicator } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import { collection, getDocs } from 'firebase/firestore';
+import {BarIndicator} from 'react-native-indicators';
+import {DotIndicator} from 'react-native-indicators';
 
 const ListAppointmentsScreen = () => {
   const [appointments, setAppointments] = useState([]);
@@ -27,7 +29,7 @@ const ListAppointmentsScreen = () => {
     <View style={styles.container}>
        {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#2196f3' />
         </View>
       )}
       <FlatList
@@ -38,6 +40,13 @@ const ListAppointmentsScreen = () => {
             <Text style={styles.title}>{item.title}</Text>
             <Text>{item.date}</Text>
             <Text>{item.userEmail}</Text>
+            <Text style={styles.doctorInfo}>
+  Anabilim Dali: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
+  {'\n'}
+  Poliklinik: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
+  {'\n'}
+  doktor adi: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
+</Text>      
           </View>
         )}
       />

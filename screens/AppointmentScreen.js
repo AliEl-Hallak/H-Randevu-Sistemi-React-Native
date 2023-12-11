@@ -7,6 +7,7 @@ import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebasseConfig';
 import { doc, getDoc } from '@firebase/firestore';
 import { logoutUser } from '../FirebasseConfig';
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 const AppointmentScreen = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false); // Veriler yükleniyor başlangıçta true olarak ayarlandı
@@ -51,7 +52,7 @@ const AppointmentScreen = ({ navigation }) => {
     <ScrollView style={styles.container}>
              {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#2196f3' />
         </View>
       )}
         <View style={styles.cardContainer}>

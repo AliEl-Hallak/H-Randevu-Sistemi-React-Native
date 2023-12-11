@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDocs } from 'firebase/firestore';
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 const CreateAppointmentScreen = ({ navigation }) => {
 
@@ -206,7 +207,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
         {/* Bekleme göstergesi */}
  {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#2196f3' />
         </View>
       )}
     </View>

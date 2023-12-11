@@ -4,11 +4,13 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 const UpdateAppointmentScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const appointmentId = route.params.appointmentId;
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadAppointmentData = async () => {
@@ -30,10 +32,14 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
     const appointmentRef = doc(FIRESTORE_DB, 'appointments', appointmentId);
 
     try {
+      setIsLoading(true); // Bekleme durumunu başlat
+
       await updateDoc(appointmentRef, {
         title: title,
         date: date,
       });
+      setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
       Alert.alert("Başarılı", "Randevu güncellendi", [
         { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
       ]);
@@ -47,12 +53,19 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
       });
 
     } catch (error) {
+      setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
+
       Alert.alert("Hata", "Randevu güncellenemedi: " + error.message);
     }
   };
 
   return (
     <View style={styles.container}>
+                  {isLoading && (
+        <View style={styles.loadingContainer}>
+<DotIndicator  color='#2196f3' />
+        </View>
+      )}
       <Text style={styles.header}>Randevu Güncelleme</Text>
       <TextInput
         style={styles.input}
@@ -127,6 +140,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: '#ddd',
     backgroundColor: '#f9f9f9', // Giriş alanı arka plan rengi
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });
 

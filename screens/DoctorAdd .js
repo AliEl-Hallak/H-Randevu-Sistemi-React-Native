@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,
 import { addDoc, collection } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 
 const DoctorAdd = ({ navigation }) => {
@@ -114,7 +115,7 @@ const DoctorAdd = ({ navigation }) => {
       {/* Bekleme göstergesi */}
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#4caf50' />
         </View>
       )}
       {/* Lottie Animasyon */}

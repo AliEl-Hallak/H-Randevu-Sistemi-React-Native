@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getAuth, updatePassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Eklemeyi unutmayın
 import LottieView from 'lottie-react-native';
+import {DotIndicator} from 'react-native-indicators';
 
 const EditProfileScreen = ({ route }) => {
   const [username, setUsername] = useState('');
@@ -87,7 +88,7 @@ const EditProfileScreen = ({ route }) => {
         {/* Bekleme göstergesi */}
  {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#4caf50' />
         </View>
       )}
       <Text style={styles.label}>Kullanıcı Adı</Text>

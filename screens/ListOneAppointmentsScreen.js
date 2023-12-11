@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet,ActivityIndicator } from 'react-native';
+import { Alert, View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LottieView from 'lottie-react-native';
+import {
 
+  DotIndicator,
+ 
+} from 'react-native-indicators';
 const ListOneAppointmentsScreen = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
   const userId = FIREBASE_AUTH.currentUser ? FIREBASE_AUTH.currentUser.uid : null;
@@ -24,8 +28,9 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
 
         setAppointments(fetchedAppointments);
         setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
-
+     
       }
+      
     };
 
     fetchAppointments();
@@ -35,7 +40,7 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
     <View style={styles.container}>
            {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4caf50" />
+<DotIndicator  color='#2196f3' />
         </View>
       )}
       <FlatList
@@ -46,11 +51,11 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.date}>{item.date}</Text>
             <Text style={styles.doctorInfo}>
-  Clinic: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
+  Anabilim Dali: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
   {'\n'}
-  Department: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
+  Poliklinik: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
   {'\n'}
-  Name: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
+  doktor adi: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
 </Text>      
             <View style={styles.buttonsContainer}>
        
