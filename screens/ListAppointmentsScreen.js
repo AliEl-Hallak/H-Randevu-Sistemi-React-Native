@@ -37,16 +37,22 @@ const ListAppointmentsScreen = () => {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.appointmentItem}>
-            <Text style={styles.title}>{item.title}</Text>
             <Text>{item.date}</Text>
-            <Text>{item.userEmail}</Text>
             <Text style={styles.doctorInfo}>
-  Anabilim Dali: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
-  {'\n'}
-  Poliklinik: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
-  {'\n'}
-  doktor adi: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
-</Text>      
+            
+            Randevu Başlığı: {item.title ? item.title : 'Bilgi Yok'}
+                {'\n'}
+                Hasta E-posta: {item.userEmail ? item.userEmail : 'Bilgi Yok'}
+                {'\n'}
+              
+                Doktor Adı: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
+                {'\n'}
+                Randevu gunu: {item.workingDay ? item.workingDay : 'Bilgi Yok'}
+                {'\n'}
+                randevu Saati: {item.workingHour ? item.workingHour : 'Bilgi Yok'}
+                {'\n'}
+
+        </Text>      
           </View>
         )}
       />

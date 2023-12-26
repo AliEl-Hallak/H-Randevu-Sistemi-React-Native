@@ -35,12 +35,19 @@ const AdminScreen = ({ navigation, route }) => {
               <Icon name="format-list-bulleted" size={30} color="#fff" />
               <Text style={styles.cardTitle}>Randevulari Listele</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+              style={[styles.card, styles.docList]}
+              onPress={() => navigation.navigate('DoctorListScreen')}>
+              <Icon name="format-list-bulleted" size={30} color="#fff" />
+              <Text style={styles.cardTitle}>doktorlari Listele</Text>
+          </TouchableOpacity>
          
       </View>
 
       <View style={styles.lottieContainer}>
           <LottieView
-            source={require('../resim/r1.json')} // Make sure this path is correct
+            source={require('../resim/admin.json')} // Make sure this path is correct
             autoPlay
             loop={true}
             style={styles.lottieAnimation}
@@ -87,6 +94,9 @@ const styles = StyleSheet.create({
   cardList: {
     backgroundColor: '#2196f3', // Mavi renk
   },
+  docList:{
+    backgroundColor: '#FFA500', // Turuncu renk
+  },
   cardTitle: {
     marginTop: 10,
     color: '#fff',
@@ -100,7 +110,7 @@ const styles = StyleSheet.create({
   },
   lottieAnimation: {
     width: 300, // Adjust width as needed
-    height: 350, // Adjust height as needed
+    height: 400, // Adjust height as needed
   },
 });
 

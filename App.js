@@ -15,6 +15,7 @@ import DeletAppointmentsScreen from './screens/DeletAppointmentsScreen';
 import UserProfileScreen from './screens/UserProfileScreen';
 import DoctorAdd from './screens/DoctorAdd ';
 import EditProfileScreen from './screens/EditProfileScreen';
+import DoctorListScreen from './screens/DoctorListScreen';
 const Stack = createNativeStackNavigator();
 import * as Notifications from 'expo-notifications';
 Notifications.setNotificationHandler({
@@ -42,6 +43,7 @@ const App = () => {
         <Stack.Screen name="Doctor" component={DoctorAdd} />
         <Stack.Screen name="UserProfile" component={UserProfileScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="DoctorListScreen" component={DoctorListScreen} />
 
         
       </Stack.Navigator>

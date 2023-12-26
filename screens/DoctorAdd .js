@@ -1,45 +1,69 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../FirebasseConfig';
 import LottieView from 'lottie-react-native';
-import {DotIndicator} from 'react-native-indicators';
-
+import { DotIndicator } from 'react-native-indicators';
 
 const DoctorAdd = ({ navigation }) => {
   const [department, setDepartment] = useState('');
   const [clinic, setClinic] = useState('');
   const [doctorName, setDoctorName] = useState('');
-  const [error, setError] = useState({ department: '', clinic: '', doctorName: '' });
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [workingHours, setWorkingHours] = useState([]);
+  const [error, setError] = useState({ department: '', clinic: '', doctorName: '', workingHours: '', selectedDays: '' });
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     let isValid = true;
-    setError({ department: '', clinic: '', doctorName: '' }); // Önceki hataları temizleyin
+    setError({ department: '', clinic: '', doctorName: '', workingHours: '', selectedDays: '' });
 
     if (!department.trim()) {
-      setError(prevState => ({ ...prevState, department: 'Anabilim Dalını doldurunuz.' }));
+      setError((prevState) => ({ ...prevState, department: 'Anabilim Dalını doldurunuz.' }));
       isValid = false;
-    } else {
-      setError(prevState => ({ ...prevState, department: '' }));
     }
 
     if (!clinic.trim()) {
-      setError(prevState => ({ ...prevState, clinic: 'Polikliniği doldurunuz.' }));
+      setError((prevState) => ({ ...prevState, clinic: 'Polikliniği doldurunuz.' }));
       isValid = false;
-    } else {
-      setError(prevState => ({ ...prevState, clinic: '' }));
     }
 
     if (!doctorName.trim()) {
-      setError(prevState => ({ ...prevState, doctorName: 'Doktor Adını doldurunuz.' }));
+      setError((prevState) => ({ ...prevState, doctorName: 'Doktor Adını doldurunuz.' }));
       isValid = false;
-    } else {
-      setError(prevState => ({ ...prevState, doctorName: '' }));
+    }
+
+    if (selectedDays.length === 0) {
+      setError((prevState) => ({ ...prevState, selectedDays: 'Çalışma günlerini seçiniz.' }));
+      isValid = false;
+    }
+
+    if (workingHours.length === 0) {
+      setError((prevState) => ({ ...prevState, workingHours: 'Çalışma saatlerini seçiniz.' }));
+      isValid = false;
     }
 
     return isValid;
   };
+
+  const toggleDaySelection = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter((selectedDay) => selectedDay !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
+
+  const toggleWorkingHourSelection = (hour) => {
+    if (workingHours.includes(hour)) {
+      setWorkingHours(workingHours.filter((selectedHour) => selectedHour !== hour));
+    } else {
+      setWorkingHours([...workingHours, hour]);
+    }
+  };
+
+  const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+  const hoursOfDay = ['09:00','10:00','11:00', '12:00', '13:00','14:00', '15:00','16:00','17:00'];
 
   const handleAddDoctor = async () => {
     if (!validateForm()) {
@@ -47,101 +71,132 @@ const DoctorAdd = ({ navigation }) => {
     }
 
     try {
-            setIsLoading(true); // Bekleme durumunu başlat
+      setIsLoading(true);
 
       await addDoc(collection(FIRESTORE_DB, 'doctors'), {
         department,
         clinic,
         name: doctorName,
+        workingDays: selectedDays,
+        workingHours,
       });
-   
-      setIsLoading(false); // Bekleme durumunu sonlandır
 
-      Alert.alert("Başarılı", "Doktor bilgileri eklendi", [
-        { text: 'Tamam', onPress: () => navigation.goBack() }
+      setIsLoading(false);
+
+      Alert.alert('Başarılı', 'Doktor bilgileri eklendi', [
+        { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      setIsLoading(false); // Bekleme durumunu sonlandır
+      setIsLoading(false);
       setError('Doktor bilgileri eklenemedi');
     }
-
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Doktor Ekle</Text>
-
-      {/* Anabilim Dalı */}
+    <ScrollView contentContainerStyle={styles.container}>
       <TextInput
         style={error.department ? styles.inputError : styles.input}
         value={department}
         onChangeText={(text) => {
           setDepartment(text);
-          validateForm(); // Her değişiklikte doğrulamayı tetikleyin
+          validateForm();
         }}
         placeholder="Anabilim Dalı"
       />
       {error.department ? <Text style={styles.errorText}>{error.department}</Text> : null}
 
-      {/* Poliklinik */}
       <TextInput
         style={error.clinic ? styles.inputError : styles.input}
         value={clinic}
         onChangeText={(text) => {
           setClinic(text);
-          validateForm(); // Her değişiklikte doğrulamayı tetikleyin
+          validateForm();
         }}
         placeholder="Poliklinik"
       />
       {error.clinic ? <Text style={styles.errorText}>{error.clinic}</Text> : null}
 
-      {/* Doktor Adı */}
       <TextInput
         style={error.doctorName ? styles.inputError : styles.input}
         value={doctorName}
         onChangeText={(text) => {
           setDoctorName(text);
-          validateForm(); // Her değişiklikte doğrulamayı tetikleyin
+          validateForm();
         }}
         placeholder="Doktor Adı"
       />
       {error.doctorName ? <Text style={styles.errorText}>{error.doctorName}</Text> : null}
 
-      {/* Ekleme Butonu */}
+      <View style={styles.daysContainer}>
+        {daysOfWeek.map((day) => (
+          <TouchableOpacity
+            key={day}
+            style={[
+              styles.dayButton,
+              selectedDays.includes(day) && styles.selectedDayButton,
+            ]}
+            onPress={() => toggleDaySelection(day)}
+          >
+            <Text style={selectedDays.includes(day) ? styles.selectedDayText : styles.dayText}>
+              {day}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {error.selectedDays ? <Text style={styles.errorText}>{error.selectedDays}</Text> : null}
+
+      <View style={styles.hoursContainer}>
+        {hoursOfDay.map((hour) => (
+          <TouchableOpacity
+            key={hour}
+            style={[
+              styles.hourButton,
+              workingHours.includes(hour) && styles.selectedHourButton,
+            ]}
+            onPress={() => toggleWorkingHourSelection(hour)}
+          >
+            <Text style={workingHours.includes(hour) ? styles.selectedHourText : styles.hourText}>
+              {hour}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {error.workingHours ? <Text style={styles.errorText}>{error.workingHours}</Text> : null}
+
       <TouchableOpacity style={styles.saveButton} onPress={handleAddDoctor}>
         <Text style={styles.saveButtonText}>Ekle</Text>
       </TouchableOpacity>
 
-      {/* Bekleme göstergesi */}
       {isLoading && (
         <View style={styles.loadingContainer}>
-<DotIndicator  color='#4caf50' />
+          <DotIndicator color="#4caf50" />
         </View>
       )}
-      {/* Lottie Animasyon */}
+
       <View style={styles.lottieContainer}>
         <LottieView
-          source={require('../resim/r10.json')} // Animasyon dosya yolu doğru olmalı
+          source={require('../resim/r10.json')}
           autoPlay
           loop={true}
           style={styles.lottieAnimation}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Align items to the start
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
   },
   saveButton: {
-    marginTop:10,
-    width :'100%',
+    marginTop: 10,
+    width: '100%',
     backgroundColor: '#4caf50',
     padding: 10,
     borderRadius: 5,
@@ -152,10 +207,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  header: {
-    fontSize: 22,
+  subHeader: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#333',
   },
   loadingContainer: {
@@ -174,17 +229,16 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 10,
     borderRadius: 4,
-    backgroundColor: '#f9f9f9',    
+    backgroundColor: '#f9f9f9',
     borderColor: 'red',
     borderWidth: 1,
   },
   errorText: {
     color: 'red',
-    // Diğer stil tanımlamaları
   },
   input: {
     width: '100%',
-    marginVertical: 10, // Reduced vertical margin
+    marginVertical: 10,
     borderWidth: 1,
     padding: 10,
     borderRadius: 4,
@@ -192,7 +246,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   lottieContainer: {
-    flexGrow: 1, // This will push the container to the bottom
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -200,7 +254,50 @@ const styles = StyleSheet.create({
     width: 300,
     height: 200,
   },
+  daysContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  dayButton: {
+    margin: 5,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  selectedDayButton: {
+    backgroundColor: '#4caf50',
+  },
+  dayText: {
+    color: '#333',
+  },
+  selectedDayText: {
+    color: 'white',
+  },
+  hoursContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  hourButton: {
+    margin: 5,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  selectedHourButton: {
+    backgroundColor: '#4caf50',
+  },
+  hourText: {
+    color: '#333',
+  },
+  selectedHourText: {
+    color: 'white',
+  },
 });
-
 
 export default DoctorAdd;

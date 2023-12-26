@@ -59,8 +59,14 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
         </View>
       )}
       <View style={styles.appointmentCard}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.date}>{date}</Text>
+          <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('../resim/delete.json')} // Make sure this path is correct
+            autoPlay
+            loop={true}
+            style={styles.lottieAnimation}
+          />
+        </View>
         <TouchableOpacity 
           style={styles.deleteButton} 
           onPress={handleDelete}>
@@ -69,14 +75,7 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.lottieContainer}>
-          <LottieView
-            source={require('../resim/delete.json')} // Make sure this path is correct
-            autoPlay
-            loop={true}
-            style={styles.lottieAnimation}
-          />
-        </View>
+    
     </View>
   );
 };
@@ -109,6 +108,7 @@ const styles = StyleSheet.create({
     height: 400,
   },
   title: {
+    textAlign:'center',
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',

@@ -3,6 +3,7 @@ import { Alert, View, Text, FlatList, StyleSheet, ActivityIndicator } from 'reac
 import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LottieView from 'lottie-react-native';
 import {
@@ -14,6 +15,7 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
   const userId = FIREBASE_AUTH.currentUser ? FIREBASE_AUTH.currentUser.uid : null;
   const [isLoading, setIsLoading] = useState(true); // Veriler yükleniyor başlangıçta true olarak ayarlandı
+  const [noAppointments, setNoAppointments] = useState(false); // Randevu olmadığını belirlemek için bir state
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -28,9 +30,8 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
 
         setAppointments(fetchedAppointments);
         setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
-     
+        setNoAppointments(fetchedAppointments.length === 0); // Randevu sayısına göre noAppointments'i güncelle
       }
-      
     };
 
     fetchAppointments();
@@ -38,53 +39,71 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-           {isLoading && (
+     
+      {isLoading && (
         <View style={styles.loadingContainer}>
-<DotIndicator  color='#2196f3' />
+          <DotIndicator color='#2196f3' />
         </View>
       )}
-      <FlatList
-        data={appointments}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.appointmentItem}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.date}>{item.date}</Text>
-            <Text style={styles.doctorInfo}>
-  Anabilim Dali: {item.doctorId ? item.doctorId.clinic : 'Bilgi Yok'}
-  {'\n'}
-  Poliklinik: {item.doctorId ? item.doctorId.department : 'Bilgi Yok'}
-  {'\n'}
-  doktor adi: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
-</Text>      
-            <View style={styles.buttonsContainer}>
-       
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  navigation.navigate('UpdateAppointments', {
-                    appointmentId: item.id,
-                    title: item.title,
-                    date: item.date,
-                  })
-                }>
-                <Text>Güncelle</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  navigation.navigate('DeletAppointment', {
-                    appointmentId: item.id,
-                    title: item.title,
-                    date: item.date,
-                  })
-                }>
-                <Text>Sil</Text>
-              </TouchableOpacity>
+      {noAppointments && !isLoading && (
+        
+         <View style={styles.lottieContainer}>
+         <LottieView
+           source={require('../resim/Nodataavla.json')}
+           autoPlay
+           loop
+           style={styles.lottieAnimation}
+         />
+          <Text style={styles.noAppointmentsText}>Herhangi bir randevunuz bulunmamaktadır.</Text>
+       </View>
+      )}
+      {!noAppointments && (
+        <FlatList
+          data={appointments}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.appointmentItem}>
+           
+              <Text style={styles.date}>{item.date}</Text>
+              <Text style={styles.doctorInfo}>
+              Randevu Başlığı: {item.title ? item.title : 'Bilgi Yok'}
+                {'\n'}
+                Doktor Adı: {item.doctorId ? item.doctorId.name : 'Bilgi Yok'}
+                {'\n'}
+                Randevu gunu: {item.workingDay ? item.workingDay : 'Bilgi Yok'}
+                {'\n'}
+                randevu Saati: {item.workingHour ? item.workingHour : 'Bilgi Yok'}
+                {'\n'}
+
+              </Text>
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    navigation.navigate('UpdateAppointments', {
+                      appointmentId: item.id,
+                      title: item.title,
+                      date: item.date,
+                    })
+                  }>
+                  <Text>Güncelle</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    navigation.navigate('DeletAppointment', {
+                      appointmentId: item.id,
+                      title: item.title,
+                      date: item.date,
+                    })
+                  }>
+                  <Text>Sil</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -105,38 +124,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
+  noAppointmentsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noAppointmentsText: { // Metin rengi güncellendi
+
+    fontSize: 18,
+    textAlign: 'center',
+  },
   appointmentItem: {
-    backgroundColor: '#ffffff',      // Parlak beyaz arka plan
-    borderRadius: 20,                // Daha belirgin yuvarlatılmış köşeler
-    padding: 20,                     // Geniş iç boşluk
-    marginVertical: 12,              // Daha fazla dikey aralık
-    marginHorizontal: 15,            // Daha fazla yatay aralık
-    borderWidth: 2,                  // Daha kalın çerçeve
-    borderColor: '#d3d3d3',          // Açık gri çerçeve rengi
-    shadowColor: '#000',             // Gölge rengi
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    marginVertical: 12,
+    marginHorizontal: 15,
+    borderWidth: 2,
+    borderColor: '#d3d3d3',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,             // Gölge opaklığı
-    shadowRadius: 3.84,              // Gölge yarıçapı
-    elevation: 5,                    // Android için gölge efekti
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   title: {
-     
-    fontSize: 22,                    // Daha büyük ve belirgin başlık fontu
-    fontWeight: '700',               // Ağır font ağırlığı
-    color: '#2a2a2a',                // Koyu gri başlık rengi
-    marginBottom: 10,                // Başlık alt boşluk
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2a2a2a',
+    marginBottom: 10,
   },
   date: {
-    fontSize: 18,                    // Büyütülmüş tarih fontu
-    fontWeight: '500',               // Orta kalınlıkta font ağırlığı
-    color: '#4a4a4a',                // Koyu gri tarih rengi
-    marginBottom: 15,                // Arttırılmış tarih alt boşluk
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#4a4a4a',
+    marginBottom: 15,
   },
   doctorInfo: {
-    fontSize: 16,                    // Net doktor bilgisi fontu
-    color: '#606060',                // Koyu gri metin rengi
-    lineHeight: 24,                  // Geniş satır yüksekliği
-    fontStyle: 'italic',             // İtalik font stili
+    fontSize: 16,
+    color: '#606060',
+    lineHeight: 24,
+    fontStyle: 'italic',
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -149,13 +177,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   lottieContainer: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   lottieAnimation: {
     width: 300,
-    height: 350,
+    height: 400,
   },
 });
 
