@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { FIRESTORE_DB } from '../FirebasseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { DotIndicator } from 'react-native-indicators';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const DoctorListScreen = () => {
   const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingDoctorId, setDeletingDoctorId] = useState(null);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -22,6 +24,26 @@ const DoctorListScreen = () => {
     fetchDoctors();
   }, []);
 
+  const handleDeleteDoctor = async (doctorId) => {
+    try {
+      // Silme işlemi başladığında loading göstergesini göster
+      setDeletingDoctorId(doctorId);
+
+      await deleteDoc(doc(FIRESTORE_DB, 'doctors', doctorId));
+      // Doktor başarıyla silindiğinde bir geri bildirim göster
+      Alert.alert('Başarılı', 'Doktor başarıyla silindi.', [{ text: 'Tamam' }]);
+      // Silinen doktoru listeden kaldır
+      setDoctors((prevDoctors) => prevDoctors.filter((doctor) => doctor.id !== doctorId));
+    } catch (error) {
+      console.error('Doktor silinirken hata oluştu:', error);
+      // Silme işlemi başarısız olduğunda bir hata mesajı göster
+      Alert.alert('Hata', 'Doktor silinirken bir hata oluştu.', [{ text: 'Tamam' }]);
+    } finally {
+      // Silme işlemi tamamlandığında loading göstergesini kapat
+      setDeletingDoctorId(null);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {isLoading && (
@@ -33,18 +55,26 @@ const DoctorListScreen = () => {
         data={doctors}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-            <View style={styles.doctorItem}>
-            <Text style={styles.doctorInfo}>
-              {item.name} - {item.department} - {item.clinic}
-            </Text>
-            <Text style={styles.workingDays}>
-              Çalışma Günleri: {item.workingDays.join(', ')}
-            </Text>
-            <Text style={styles.workingHours}>
-              Çalışma Saatleri: {item.workingHours.join(', ')}
-            </Text>
+          <View style={styles.doctorItem}>
+            <View style={styles.doctorInfoContainer}>
+              <Text style={styles.doctorInfo}>
+                ({item.name} - {item.department} - {item.clinic})
+              </Text>
+              <Text style={styles.workingDays}>
+                Çalışma Günleri: {item.workingDays.join(', ')}
+              </Text>
+              <Text style={styles.workingHours}>
+                Çalışma Saatleri: {item.workingHours.join(', ')}
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => handleDeleteDoctor(item.id)} style={styles.deleteIcon}>
+              {deletingDoctorId === item.id ? (
+                <ActivityIndicator color="red" />
+              ) : (
+                <Icon name="delete" size={24} color="red" />
+              )}
+            </TouchableOpacity>
           </View>
-          
         )}
       />
     </View>
@@ -68,6 +98,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   doctorItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Sağa ve sola doğru genişletmek için
+    alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
@@ -80,7 +113,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  doctorName: {
+  doctorInfoContainer: {
+    flex: 1, // İçeriklerin sağa genişlemesini sağlar
+  },
+  doctorInfo: {
     fontWeight: 'bold',
     fontSize: 16,
     color: '#333',
@@ -101,6 +137,9 @@ const styles = StyleSheet.create({
   workingHours: {
     color: '#666',
     fontSize: 14,
+  },
+  deleteIcon: {
+    marginLeft: 10,
   },
 });
 

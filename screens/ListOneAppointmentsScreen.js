@@ -86,7 +86,7 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
                       date: item.date,
                     })
                   }>
-                  <Text>Güncelle</Text>
+      <Icon name="update" size={30} color="#4a70e2" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.button}
@@ -97,7 +97,7 @@ const ListOneAppointmentsScreen = ({ navigation }) => {
                       date: item.date,
                     })
                   }>
-                  <Text>Sil</Text>
+              <Icon name="delete" size={30} color="red" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  noAppointmentsText: { // Metin rengi güncellendi
-
+  noAppointmentsText: { 
+    color: 'gray',
     fontSize: 18,
     textAlign: 'center',
   },
@@ -171,11 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  button: {
-    padding: 10,
-    backgroundColor: '#e7e7e7',
-    borderRadius: 5,
-  },
+ 
   lottieContainer: {
     flexGrow: 1,
     alignItems: 'center',

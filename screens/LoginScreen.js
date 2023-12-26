@@ -17,7 +17,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       // Firebase ile giriş yapma işlemi
       const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
-      if (userCredential.user.uid === "WYz8UeYLPHXxfOEpm1rSALmROzA3") {
+      if (userCredential.user.uid === "x0rpMYkEdqbbSbSfnxvFLhBfQ6B2") {
         const userEmail = userCredential.user.email;
         // Belirtilen UID'ye sahip kullanıcı için Admin ekranına yönlendir
         navigation.navigate('Admin', { email: userEmail });

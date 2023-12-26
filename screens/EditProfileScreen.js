@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity,ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB, FIREBASE_AUTH } from '../FirebasseConfig';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth, updatePassword } from 'firebase/auth';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Eklemeyi unutmayın
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import LottieView from 'lottie-react-native';
-import {DotIndicator} from 'react-native-indicators';
+import { DotIndicator } from 'react-native-indicators';
 
 const EditProfileScreen = ({ route }) => {
   const [username, setUsername] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const navigation = useNavigation();
   const [newPassword, setNewPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   // Burada uid değerinin varlığını ve geçerliliğini kontrol ediyoruz
   const uid = route.params?.uid;
@@ -41,20 +42,20 @@ const EditProfileScreen = ({ route }) => {
   const handleSaveChanges = async () => {
     const userRef = doc(FIRESTORE_DB, 'users', uid);
     try {
-      setIsLoading(true); // Bekleme durumunu başlat
+      setIsLoading(true);
 
       await updateDoc(userRef, {
         username: username,
         phoneNumber: phoneNumber,
       });
-      setIsLoading(false); // Bekleme durumunu başlat
+
+      setIsLoading(false);
 
       Alert.alert("Başarılı", "Profil güncellendi", [
         { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
       ]);
     } catch (error) {
-      setIsLoading(false); // Bekleme durumunu başlat
-
+      setIsLoading(false);
       Alert.alert("Hata", "Profil güncellenemedi: " + error.message);
     }
   };
@@ -68,8 +69,18 @@ const EditProfileScreen = ({ route }) => {
       return;
     }
 
-    if (!newPassword) {
-      Alert.alert('Hata', 'Yeni şifre boş olamaz.');
+    if (!oldPassword || !newPassword) {
+      Alert.alert('Hata', 'Eski ve yeni şifre alanları boş olamaz.');
+      return;
+    }
+
+    // Kullanıcının eski şifresini doğrulama
+    const credential = EmailAuthProvider.credential(user.email, oldPassword);
+    try {
+      await reauthenticateWithCredential(user, credential);
+    } catch (error) {
+      console.error('Eski şifre doğrulaması başarısız:', error);
+      Alert.alert('Hata', 'Eski şifre doğrulaması başarısız.');
       return;
     }
 
@@ -85,10 +96,10 @@ const EditProfileScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-        {/* Bekleme göstergesi */}
- {isLoading && (
+      {/* Bekleme göstergesi */}
+      {isLoading && (
         <View style={styles.loadingContainer}>
-<DotIndicator  color='#4caf50' />
+          <DotIndicator color='#4caf50' />
         </View>
       )}
       <Text style={styles.label}>Kullanıcı Adı</Text>
@@ -107,7 +118,17 @@ const EditProfileScreen = ({ route }) => {
         placeholder="Telefon numaranızı girin"
       />
 
+    
+<Text style={styles.label}>Şifre Ayarları</Text>
+
       <View style={styles.passwordContainer}>
+          <TextInput
+        style={styles.passwordInput}
+        value={oldPassword}
+        onChangeText={setOldPassword}
+        secureTextEntry
+        placeholder="Eski Şifre"
+      />
         <TextInput
           style={styles.passwordInput}
           value={newPassword}
@@ -116,7 +137,7 @@ const EditProfileScreen = ({ route }) => {
           placeholder="Yeni Şifre"
         />
         <TouchableOpacity style={styles.passwordIcon} onPress={handleChangePassword}>
-          <Icon name="vpn-key" size={24} color="#2196F3" />
+        <Icon name="update" size={30} color="green" />
         </TouchableOpacity>
       </View>
 
@@ -124,13 +145,13 @@ const EditProfileScreen = ({ route }) => {
         <Text style={styles.saveButtonText}>Değişiklikleri Kaydet</Text>
       </TouchableOpacity>
       <View style={styles.lottieContainer}>
-          <LottieView
-            source={require('../resim/r8.json')} // Make sure this path is correct
-            autoPlay
-            loop={true}
-            style={styles.lottieAnimation}
-          />
-        </View>
+        <LottieView
+          source={require('../resim/r8.json')} // Make sure this path is correct
+          autoPlay
+          loop={true}
+          style={styles.lottieAnimation}
+        />
+      </View>
     </View>
   );
 };
@@ -142,6 +163,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   label: {
+        color: 'green', // Metin rengi güncellendi
+
+    textAlign:'center',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
@@ -155,6 +179,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
+    marginTop:20,
+
     backgroundColor: '#4caf50',
     padding: 10,
     borderRadius: 5,
@@ -176,7 +202,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
-    marginBottom: 20,
+    marginRight: 10,
   },
   loadingContainer: {
     position: 'absolute',
@@ -189,18 +215,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-
   passwordIcon: {
     marginLeft: 10,
   },
   lottieContainer: {
-    alignItems: 'center', // Center the LottieView horizontally
-    justifyContent: 'center', // Center the LottieView vertically
-    marginTop: 0, // Add some space above the LottieView
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
   },
   lottieAnimation: {
-    width: 300, // Adjust width as needed
-    height: 350, // Adjust height as needed
+    width: 300,
+    height: 400,
   },
 });
 
