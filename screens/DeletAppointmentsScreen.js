@@ -6,10 +6,12 @@ import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
 import LottieView from 'lottie-react-native';
 import {DotIndicator} from 'react-native-indicators';
+import CustomAlert from '../CustomAlert';
 
 const DeletAppointmentsScreen = ({ route, navigation }) => {
   const { appointmentId, title, date } = route.params;
   const [isLoading, setIsLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const handleDelete = async () => {
     Alert.alert(
@@ -26,18 +28,9 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
               await deleteDoc(doc(FIRESTORE_DB, 'appointments', appointmentId));
               setIsLoading(false); // Veriler yüklendiğinde beklemeyi kaldır
  
-             
-              Alert.alert('Başarılı', 'Randevu silindi', [
-                { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
-              ]);
+              setAlertVisible(true);
 
-              Notifications.scheduleNotificationAsync({
-                content: {
-                  title: "Randevunuz İptal Edildi 🚫",
-                  body: 'Planlarınızı gözden geçirmeniz gerekebilir. Yeni bir randevu için bizimle iletişime geçebilirsiniz.',
-                },
-                trigger: { seconds: 1 }, // 1 saniye sonra gönder
-              });
+             
 
 
             } catch (error) {
@@ -50,7 +43,18 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
       ]
     );
   };
-
+  const handleAlertClose = () => {
+    setAlertVisible(false);
+    navigation.navigate('Appointment')  
+    // Bildirim gönderme işlemi buraya taşındı
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Randevunuz İptal Edildi 🚫",
+        body: 'Planlarınızı gözden geçirmeniz gerekebilir. Yeni bir randevu için bizimle iletişime geçebilirsiniz.',
+      },
+      trigger: { seconds: 1 }, // 1 saniye sonra gönder
+    });
+  };
   return (
     <View style={styles.container}>
               {isLoading && (
@@ -73,15 +77,22 @@ const DeletAppointmentsScreen = ({ route, navigation }) => {
           <Icon name="delete" size={24} color="white" />
           <Text style={styles.deleteButtonText}>Randevuyu Sil</Text>
         </TouchableOpacity>
+        
       </View>
 
-    
+      <CustomAlert
+        visible={alertVisible}
+        message="Başarılı', 'Randevu silindi"
+        onClose={handleAlertClose}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    justifyContent: 'center',
+
     flex: 1,
     alignItems: 'center',
     padding: 20,

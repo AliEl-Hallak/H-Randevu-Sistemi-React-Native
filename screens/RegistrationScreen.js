@@ -46,6 +46,8 @@ const RegistrationScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+          <View style={styles.cont}>
+
       <TextInput
         style={styles.input}
         value={username}
@@ -77,6 +79,8 @@ const RegistrationScreen = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.linkText}>Zaten bir hesabınız var mı? Giriş Yap</Text>
       </TouchableOpacity>
+      </View>
+
     </View>
   );
 };
@@ -90,16 +94,27 @@ const styles = StyleSheet.create({
     input: {
       height: 50,
       borderColor: '#e1e1e1',
-      borderWidth: 1,
+      borderWidth: 2,
       marginBottom: 15,
       paddingHorizontal: 10,
       borderRadius: 5,
-      backgroundColor: '#fff',
+      backgroundColor: 'white',
     },
     linkText: {
       color: '#4a90e2',
       marginTop: 15,
       textAlign: 'center',
+    },
+    cont: {
+      width: '100%',
+      padding: 20,
+      borderRadius: 10,
+      backgroundColor: '#fff',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
   });
 export default RegistrationScreen;

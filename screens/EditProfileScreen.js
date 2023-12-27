@@ -7,6 +7,7 @@ import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvide
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LottieView from 'lottie-react-native';
 import { DotIndicator } from 'react-native-indicators';
+import CustomAlert from '../CustomAlert';
 
 const EditProfileScreen = ({ route }) => {
   const [username, setUsername] = useState('');
@@ -15,6 +16,7 @@ const EditProfileScreen = ({ route }) => {
   const [oldPassword, setOldPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
+  const [alertVisible, setAlertVisible] = useState(false);
 
   // Burada uid değerinin varlığını ve geçerliliğini kontrol ediyoruz
   const uid = route.params?.uid;
@@ -50,10 +52,9 @@ const EditProfileScreen = ({ route }) => {
       });
 
       setIsLoading(false);
+      setAlertVisible(true);
 
-      Alert.alert("Başarılı", "Profil güncellendi", [
-        { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
-      ]);
+    
     } catch (error) {
       setIsLoading(false);
       Alert.alert("Hata", "Profil güncellenemedi: " + error.message);
@@ -93,7 +94,11 @@ const EditProfileScreen = ({ route }) => {
       Alert.alert('Hata', 'Şifre güncellenirken bir hata oluştu: ' + error.message);
     }
   };
-
+  const handleAlertClose = () => {
+    setAlertVisible(false);
+    navigation.navigate('Appointment')  
+    
+  };
   return (
     <View style={styles.container}>
       {/* Bekleme göstergesi */}
@@ -152,6 +157,11 @@ const EditProfileScreen = ({ route }) => {
           style={styles.lottieAnimation}
         />
       </View>
+      <CustomAlert
+        visible={alertVisible}
+        message="Başarılı, Profil güncellendi"
+        onClose={handleAlertClose}
+      />
     </View>
   );
 };

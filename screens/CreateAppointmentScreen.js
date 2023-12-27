@@ -19,7 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDocs } from 'firebase/firestore';
 import LottieView from 'lottie-react-native';
 import { DotIndicator } from 'react-native-indicators';
-
+import CustomAlert from '../CustomAlert';
 const CreateAppointmentScreen = ({ navigation }) => {
   const [appointmentTitle, setAppointmentTitle] = useState('');
   const [appointmentDate, setAppointmentDate] = useState(new Date());
@@ -33,6 +33,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
   const [selectedWorkingHour, setSelectedWorkingHour] = useState('');
   const [error, setError] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -130,47 +131,50 @@ const CreateAppointmentScreen = ({ navigation }) => {
     if (validateInput()) {
       try {
         setIsLoading(true);
-
+  
         const auth = getAuth();
         const user = auth.currentUser;
         const userEmail = user.email;
         const userId = user.uid;
         const dateString = appointmentDate.toISOString();
-
+  
         await addDoc(collection(FIRESTORE_DB, 'appointments'), {
           title: appointmentTitle,
           date: dateString,
-          doctorId: selectedDoctor, // Doktorun kimliğini buraya ekleyin
+          doctorId: selectedDoctor,
           userId: userId,
           userEmail: userEmail,
           workingDay: selectedWorkingDay,
           workingHour: selectedWorkingHour,
-
-
         });
+  
         setIsLoading(false);
-
-        Alert.alert('Başarılı', 'Randevu oluşturuldu', [
-          { text: 'Tamam', onPress: () => navigation.goBack() },
-        ]);
-
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Randevunuz Oluşturuldu 📅',
-            body: 'Yeni randevunuz başarıyla oluşturuldu. Randevu detaylarınızı kontrol ediniz.',
-          },
-          trigger: { seconds: 1 },
-        });
+  
+        setAlertVisible(true);
       } catch (error) {
         setIsLoading(false);
-
         Alert.alert('Hata', 'Randevu oluşturulamadı');
       }
+  
       setAppointmentTitle('');
       setSelectedDoctor(null);
       setSelectedWorkingDay('');
-      setSelectedWorkingHour(''); // Çalışma saati seçiminin sıfırlanması
+      setSelectedWorkingHour('');
     }
+  };
+  
+  const handleAlertClose = () => {
+    setAlertVisible(false);
+    navigation.goBack();
+  
+    // Bildirim gönderme işlemi buraya taşındı
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Randevunuz Oluşturuldu 📅',
+        body: 'Yeni randevunuz başarıyla oluşturuldu. Randevu detaylarınızı kontrol ediniz.',
+      },
+      trigger: { seconds: 1 },
+    });
   };
 
   return (
@@ -290,6 +294,11 @@ const CreateAppointmentScreen = ({ navigation }) => {
           <DotIndicator color="#2196f3" />
         </View>
       )}
+      <CustomAlert
+        visible={alertVisible}
+        message="Başarılı', 'Randevu oluşturuldu"
+        onClose={handleAlertClose}
+      />
     </View>
   );
 };

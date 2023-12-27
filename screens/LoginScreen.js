@@ -49,7 +49,11 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-     
+         <View style={styles.cont}>
+      <Text/>
+      <Text/>
+      <Text/>
+
       <TextInput
         style={styles.input}
         value={email}
@@ -68,7 +72,13 @@ const LoginScreen = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>Hesabınız yok mu? Kaydolun</Text>
       </TouchableOpacity>
+      <Text/>
+      <Text/>
+      <Text/>
+
     </View>
+    </View>
+
   );
 };
 
@@ -82,7 +92,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderColor: '#e1e1e1',
-    borderWidth: 1,
+    borderWidth: 2,
     marginBottom: 15,
     paddingHorizontal: 10,
     borderRadius: 5,
@@ -92,6 +102,17 @@ const styles = StyleSheet.create({
     color: '#4a90e2',
     marginTop: 15,
     textAlign: 'center',
+  },
+  cont: {
+    width: '100%',
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
 export default LoginScreen;

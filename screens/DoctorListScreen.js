@@ -48,7 +48,7 @@ const DoctorListScreen = () => {
     <View style={styles.container}>
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <DotIndicator color="#2196f3" />
+          <DotIndicator color="#FFA500" />
         </View>
       )}
       <FlatList

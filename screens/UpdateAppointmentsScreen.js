@@ -5,6 +5,7 @@ import { FIRESTORE_DB } from '../FirebasseConfig';
 import * as Notifications from 'expo-notifications';
 import LottieView from 'lottie-react-native';
 import { DotIndicator } from 'react-native-indicators';
+import CustomAlert from '../CustomAlert';
 
 const UpdateAppointmentScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState('');
@@ -18,7 +19,10 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
   const [workingHours, setWorkingHours] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+
   const appointmentId = route.params.appointmentId;
+  
   const handleSelectWorkingDay = (day) => {
     setWorkingDay(day);
   };
@@ -84,18 +88,11 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
       });
 
       setIsLoading(false);
+      setAlertVisible(true);
 
-      Alert.alert("Başarılı", "Randevu güncellendi", [
-        { text: 'Tamam', onPress: () => navigation.navigate('Appointment') }
-      ]);
+      
 
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Randevunuz Güncellendi",
-          body: 'Randevu detaylarınız başarıyla güncellendi.',
-        },
-        trigger: { seconds: 1 },
-      });
+     
 
     } catch (error) {
       setIsLoading(false);
@@ -113,6 +110,19 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
       </Text>
     </TouchableOpacity>
   );
+  const handleAlertClose = () => {
+    setAlertVisible(false);
+    navigation.navigate('Appointment')  
+    // Bildirim gönderme işlemi buraya taşındı
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Randevunuz Güncellendi",
+        body: 'Randevu detaylarınız başarıyla güncellendi.',
+      },
+      trigger: { seconds: 1 },
+    });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -215,6 +225,11 @@ const UpdateAppointmentScreen = ({ route, navigation }) => {
         />
       </View>
     </View>
+    <CustomAlert
+        visible={alertVisible}
+        message="Başarılı, Randevu güncellendi"
+        onClose={handleAlertClose}
+      />
     </View>
 
   );
